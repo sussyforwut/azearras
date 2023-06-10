@@ -825,21 +825,6 @@ const drawEntity = (x, y, instance, ratio, alpha = 1, scale = 1, rot = 0, turret
         yy = y,
         source = turretInfo === false ? instance : turretInfo;
     if (fade === 0 || alpha === 0) return;
-    //Glow Implementation
-    context.shadowColor = m.glowColor!=null ? getColor(m.glowColor) : mixColors(
-        getColor(instance.color),
-        render.status.getColor(),
-        render.status.getBlend()
-    );
-    if (m.glowStrength && m.glowStrength>0){
-      context.shadowBlur = m.glowStrength;
-      context.shadowOffsetX = 0;
-      context.shadowOffsetY = 0;
-    } else {
-      context.shadowBlur = 0
-      context.shadowOffsetX = 0;
-      context.shadowOffsetY = 0;
-    }
     if (render.expandsWithDeath) drawSize *= 1 + 0.5 * (1 - fade);
     if (
         config.graphical.fancyAnimations &&
@@ -945,7 +930,25 @@ const drawEntity = (x, y, instance, ratio, alpha = 1, scale = 1, rot = 0, turret
             render.status.getBlend()
         )
     );
+    //Glow Implementation
+    context.shadowColor = m.glowColor!=null ? getColor(m.glowColor) : mixColors(
+        getColor(instance.color),
+        render.status.getColor(),
+        render.status.getBlend()
+    );
+    if (m.glowStrength && m.glowStrength>0){
+      context.shadowBlur = m.glowStrength;
+      context.shadowOffsetX = 0;
+      context.shadowOffsetY = 0;
+    } else {
+      context.shadowBlur = 0
+      context.shadowOffsetX = 0;
+      context.shadowOffsetY = 0;
+    }
     drawPoly(context, xx, yy, (drawSize / m.size) * m.realSize, m.shape, rot);
+    context.shadowBlur = 0
+    context.shadowOffsetX = 0;
+    context.shadowOffsetY = 0;
     // Draw turrets above us
     if (source.turrets.length === m.turrets.length) {
         for (let i = 0; i < m.turrets.length; i++) {
@@ -985,9 +988,6 @@ const drawEntity = (x, y, instance, ratio, alpha = 1, scale = 1, rot = 0, turret
         ctx.restore();
         //ctx.globalCompositeOperation = "source-over";
     }
-    context.shadowBlur = 0
-    context.shadowOffsetX = 0;
-    context.shadowOffsetY = 0;
 };
 function drawHealth(x, y, instance, ratio, alpha) {
     let fade = instance.render.status.getFade();
