@@ -1107,7 +1107,7 @@ exports.landmineBody = {
 };
 exports.spikeBody = {
     LABEL: "",
-    CONTROLLERS: [["spin", { independent: true }]],
+    CONTROLLERS: ["spin"],
     COLOR: 9,
     SHAPE: 3,
     INDEPENDENT: true,

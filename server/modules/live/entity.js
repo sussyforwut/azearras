@@ -45,6 +45,14 @@ class Gun {
             allowBrightnessInvert: false,
         };
         this.color = '16 0 1 0 false';
+        this.bulletColorUnboxed = {
+            base: 16,
+            hueShift: 0,
+            saturationShift: 1,
+            brightnessShift: 0,
+            allowBrightnessInvert: false,
+        };
+        this.bulletColor = undefined;
         this.canShoot = false;
         this.borderless = false;
         this.drawFill = true;
@@ -81,10 +89,8 @@ class Gun {
             this.syncsSkills = info.PROPERTIES.SYNCS_SKILLS == null ? false : info.PROPERTIES.SYNCS_SKILLS;
             this.negRecoil = info.PROPERTIES.NEGATIVE_RECOIL == null ? false : info.PROPERTIES.NEGATIVE_RECOIL;
             if (info.PROPERTIES.COLOR != null) {
-                if (typeof info.PROPERTIES.COLOR === "number" || typeof info.PROPERTIES.COLOR === "string") {
-                    if (!isNaN(info.PROPERTIES.COLOR) && !isNaN(parseFloat(info.PROPERTIES.COLOR)) || /^[a-zA-Z]*$/.test(info.PROPERTIES.COLOR))
-                        this.colorUnboxed.base = info.PROPERTIES.COLOR; 
-                }
+                if (typeof info.PROPERTIES.COLOR === "number" || typeof info.PROPERTIES.COLOR === "string")
+                    this.colorUnboxed.base = info.PROPERTIES.COLOR;
                 else if (typeof info.PROPERTIES.COLOR === "object")
                     this.colorUnboxed = {
                         base: info.PROPERTIES.COLOR.BASE ?? 16,
@@ -93,13 +99,34 @@ class Gun {
                         brightnessShift: info.PROPERTIES.COLOR.BRIGHTNESS_SHIFT ?? 0,
                         allowBrightnessInvert: info.PROPERTIES.COLOR.ALLOW_BRIGHTNESS_INVERT ?? false,
                     };
-                this.color = this.colorUnboxed.base + " " + this.colorUnboxed.hueShift + " " + this.colorUnboxed.saturationShift + " " + this.colorUnboxed.brightnessShift + " " + this.colorUnboxed.allowBrightnessInvert;
+                this.color = this.colorUnboxed.base +
+                    " " + this.colorUnboxed.hueShift +
+                    " " + this.colorUnboxed.saturationShift +
+                    " " + this.colorUnboxed.brightnessShift +
+                    " " + this.colorUnboxed.allowBrightnessInvert;
+            }
+            if (info.PROPERTIES.BULLET_COLOR != null) {
+                if (typeof info.PROPERTIES.BULLET_COLOR === "number" || typeof info.PROPERTIES.BULLET_COLOR === "string")
+                    this.bulletColorUnboxed.base = info.PROPERTIES.BULLET_COLOR;
+                else if (typeof info.PROPERTIES.BULLET_COLOR === "object")
+                    this.bulletColorUnboxed = {
+                        base: info.PROPERTIES.BULLET_COLOR.BASE ?? 16,
+                        hueShift: info.PROPERTIES.BULLET_COLOR.HUE_SHIFT ?? 0,
+                        saturationShift: info.PROPERTIES.BULLET_COLOR.SATURATION_SHIFT ?? 1,
+                        brightnessShift: info.PROPERTIES.BULLET_COLOR.BRIGHTNESS_SHIFT ?? 0,
+                        allowBrightnessInvert: info.PROPERTIES.BULLET_COLOR.ALLOW_BRIGHTNESS_INVERT ?? false,
+                    };
+                this.bulletColor = this.bulletColorUnboxed.base +
+                    " " + this.bulletColorUnboxed.hueShift +
+                    " " + this.bulletColorUnboxed.saturationShift +
+                    " " + this.bulletColorUnboxed.brightnessShift +
+                    " " + this.bulletColorUnboxed.allowBrightnessInvert;
             }
             this.borderless = info.PROPERTIES.BORDERLESS == null ? false : info.PROPERTIES.BORDERLESS;
             this.drawFill = info.PROPERTIES.DRAW_FILL == null ? true : info.PROPERTIES.drawFill;
             this.destroyOldestChild = info.PROPERTIES.DESTROY_OLDEST_CHILD == null ? false : info.PROPERTIES.DESTROY_OLDEST_CHILD;
-            this.shootOnDeath = (info.PROPERTIES.SHOOT_ON_DEATH == null) ? false : info.PROPERTIES.SHOOT_ON_DEATH;
-            this.drawAbove = (info.PROPERTIES.DRAW_ABOVE == null) ? false : info.PROPERTIES.DRAW_ABOVE;
+            this.shootOnDeath = info.PROPERTIES.SHOOT_ON_DEATH == null ? false : info.PROPERTIES.SHOOT_ON_DEATH;
+            this.drawAbove = info.PROPERTIES.DRAW_ABOVE == null ? false : info.PROPERTIES.DRAW_ABOVE;
         }
         let position = info.POSITION;
         this.length = position[0] / 10;
@@ -315,7 +342,7 @@ class Gun {
             SIZE: (this.body.size * this.width * this.settings.size) / 2,
             LABEL: this.master.label + (this.label ? " " + this.label : "") + " " + o.label
         });
-        o.color = o.color ?? this.body.master.color;
+        o.color = o.color ?? this.bulletColor ?? this.body.master.color;
         // Keep track of it and give it the function it needs to deutil.log itself upon death
         if (this.countsOwnKids) {
             o.parent = this;
@@ -685,6 +712,7 @@ class Entity extends EventEmitter {
         this.guns = [];
         this.turrets = [];
         this.upgrades = [];
+        this._killers = [];
         this.settings = {};
         this.aiSettings = {};
         this.children = [];
@@ -712,6 +740,11 @@ class Entity extends EventEmitter {
         this.firingArc = [0, 360];
         this.invuln = false;
         this.alpha = 1;
+        this.max_points = c.LEVEL_CAP;
+        this.ability = {
+            timer: 0,
+            used: 0,
+        };
         this.colorUnboxed = {
             base: 16,
             hueShift: 0,
@@ -966,6 +999,7 @@ class Entity extends EventEmitter {
             this.isArenaCloser = false;
             this.ac = false;
             this.alpha = 1;
+            this.max_points = c.LEVEL_CAP;
             this.skill.LSPF = null;
             this.skill.reset();
             this.reset();
@@ -1033,9 +1067,8 @@ class Entity extends EventEmitter {
             this.skill.score = score;
             while (this.skill.maintain()) {}
         }
-        if (set.EXTRA_SKILL) {
-            this.skill.points += set.EXTRA_SKILL;
-        }
+        if (set.MAX_SKILL) this.max_points += set.MAX_SKILL;
+        if (set.EXTRA_SKILL) this.skill.points += set.EXTRA_SKILL;
         if (set.BODY != null) {
             if (set.BODY.ACCELERATION != null) this.ACCELERATION = set.BODY.ACCELERATION;
             if (set.BODY.SPEED != null) this.SPEED = set.BODY.SPEED;
@@ -1122,7 +1155,7 @@ class Entity extends EventEmitter {
         this.move();
     }
     get level() {
-        return Math.min(c.LEVEL_CAP, this.skill.level);
+        return Math.min(this.max_points, this.skill.level);
     }
     get size() {
         return this.bond == null ? (this.coreSize || this.SIZE) * (1 + this.level / 45) : this.bond.size * this.bound.size;
@@ -1638,7 +1671,9 @@ class Entity extends EventEmitter {
                     ? "a visiting " + this.label : util.addArticle(this.label)
                 : this.master.name + "'s " + this.label;
             // Calculate the jackpot
-            let jackpot = util.getJackpot(this.skill.score) / this.collisionArray.length;
+            let jackpot = this.collisionArray.length
+                ? util.getJackpot(this.skill.score) / this.collisionArray.length
+                : util.getJackpot(this.skill.score) / this._killers.length;
             // Now for each of the things that kill me...
             for (let i = 0; i < this.collisionArray.length; i++) {
                 let instance = this.collisionArray[i];
@@ -1654,6 +1689,16 @@ class Entity extends EventEmitter {
                     instance.skill.score += jackpot;
                 }
                 killTools.push(instance); // Keep track of what actually killed me
+            }
+            // For abilities...
+            for (let i = 0; i < this._killers.length; i++) {
+                let instance = this._killers[i];
+                if (instance.settings.acceptsScore) {
+                    if (instance.master.type === "tank" || instance.master.type === "miniboss") notJustFood = true;
+                    instance.skill.score += jackpot;
+                    killers.push(instance);
+                }
+                killTools.push(instance);
             }
             // Remove duplicates
             killers = killers.filter((elem, index, self) => index == self.indexOf(elem));
@@ -1734,7 +1779,24 @@ class Entity extends EventEmitter {
             }
             this.setKillers(killers);
             // Kill it
-            return 1;
+            if (this.name.includes("CONTROLLED")) {
+                this.shield.amount = this.shield.max;
+                this.health.amount = this.health.max;
+                if (this.isPlayer) {
+                    this.reset();
+                    this.socket.talk("f");
+                }
+                this.name = this.name.split("[CONTROLLED]")[0];
+                this.color = this.controlled.color;
+                this.define({
+                    LEVEL: this.controlled.level,
+                    TEAM: this.controlled.team
+                });
+                this.skill.set(this.controlled.skill);
+                this.controlled = {};
+                return 0;
+            }
+            else return 1;
         }
         return 0;
     }

@@ -574,6 +574,7 @@ exports.baseProtector = {
         HETERO: 0,
     },
     FACING_TYPE: "autospin",
+    HITS_OWN_TYPE: "pushOnlyTeam",
     TURRETS: [
         {
             POSITION: [25, 0, 0, 0, 360, 0],

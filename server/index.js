@@ -57,7 +57,9 @@ function collide(collision) {
     if (
         (!instance.activation.check() && !other.activation.check()) ||
         (instance.ac && !instance.alpha) ||
-        (other.ac && !other.alpha)
+        (other.ac && !other.alpha) ||
+        other.label.includes("Ability") ||
+        instance.label.includes("Ability")
     ) return 0;
     switch (true) {
         case instance.type === "wall" || other.type === "wall":

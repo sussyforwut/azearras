@@ -1,4 +1,4 @@
-const { combineStats, addAura } = require('../facilitators.js');
+const { combineStats, addAura, makeDeco, addLSPF, makeAbility } = require('../facilitators.js');
 const { base, gunCalcNames, basePolygonDamage, basePolygonHealth, dfltskl, statnames } = require('../constants.js');
 const g = require('../gunvals.js');
 
@@ -84,10 +84,6 @@ exports.spectator = {
         REGEN: 1e100,
     },
 };
-exports.bosses = {
-    PARENT: ["menu"],
-    LABEL: "Bosses",
-};
 exports.fun = {
     PARENT: ["menu"],
     LABEL: "Fun",
@@ -95,6 +91,10 @@ exports.fun = {
 exports.bosses = {
     PARENT: ["menu"],
     LABEL: "Bosses",
+};
+exports.special = {
+    PARENT: ["menu"],
+    LABEL: "Special",
 };
 exports.terrestrials = {
     PARENT: ["menu"],
@@ -707,8 +707,155 @@ exports.Team101 = {
 };
 exports.teams.UPGRADES_TIER_0.push("Team101");
 
+// SPECIAL
+exports.base = {
+    PARENT: ["genericTank"],
+    SKILL_CAP: [14, 14, 14, 14, 14, 14, 14, 14, 14, 14],
+    MAX_SKILL: 140,
+    LEVEL: 45 + (140 - 45) * 3,
+    SHAPE: 0,
+    BODY: {
+        ACCEL: 0.2,
+        SPEED: base.SPEED * 0.7,
+        HEALTH: base.HEALTH * 2.8,
+        DAMAGE: base.DAMAGE * 1.4,
+        SHIELD: base.SHIELD * 1.4,
+        REGEN: base.REGEN * 1.4,
+    },
+};
+
+exports.plaggAbility = makeAbility("plagg", 9);
+exports.plaggGen = addAura(0, 1, 11, [["ability", { heal: false }]]);
+exports.plagg = {
+    PARENT: ["base"],
+    LABEL: "Plagg",
+    COLOR: 11,
+    TURRETS: [
+        {
+            POSITION: [1, 0, 0, 0, 0, 1],
+            TYPE: "plaggGen",
+        },
+        {
+            POSITION: [18, 0, 0, 0, 360, 1],
+            TYPE: makeDeco(0, 9),
+        }
+    ],
+    GUNS: (() => {
+        let e = [];
+        for (let t = 0; t < 5; t++) {
+            let d = (360 / 5) * (t + 1);
+            for (let v = 0; v < 2; v++) {
+                e.push({
+                    POSITION: [10, 5, 1, 5, v == 1 ? -2.5 : 2.5, d, 0],
+                    PROPERTIES: {
+                        SHOOT_SETTINGS: combineStats([g.basic, g.pound, g.destroy, g.doublereload, g.slow]),
+                        COLOR: 9,
+                        BULLET_COLOR: 11,
+                        TYPE: "bullet",
+                    },
+                });
+            }
+        }
+        return e;
+    })(),
+};
+
+exports.tikkiAbility = makeAbility("tikki", 5);
+exports.tikkiGen = addAura(0, 1, 12, [["ability", { heal: true }]]);
+exports.tikki = {
+    PARENT: ["base"],
+    LABEL: "Tikki",
+    COLOR: 12,
+    TURRETS: [
+        {
+            POSITION: [1, 0, 0, 0, 0, 1],
+            TYPE: "tikkiGen",
+        },
+        {
+            POSITION: [4, 0, 0, 0, 360, 1],
+            TYPE: makeDeco(0, 9),
+        },
+        {
+            POSITION: [4, -4.5, -4.5, 0, 360, 1],
+            TYPE: makeDeco(0, 9),
+        },
+        {
+            POSITION: [4, -4.5, 4.5, 0, 360, 1],
+            TYPE: makeDeco(0, 9),
+        },
+        {
+            POSITION: [4, 4.5, -4.5, 0, 360, 1],
+            TYPE: makeDeco(0, 9),
+        },
+        {
+            POSITION: [4, 4.5, 4.5, 0, 360, 1],
+            TYPE: makeDeco(0, 9),
+        },
+    ],
+    GUNS: (() => {
+        let e = [];
+        for (let t = 0; t < 5; t++) {
+            let d = (360 / 5) * (t + 1);
+            for (let v = 0; v < 2; v++) {
+                let O = {
+                    POSITION: [10, 5, 1, 5, v == 1 ? -2.5 : 2.5, d, 0],
+                    PROPERTIES: {
+                        SHOOT_SETTINGS: combineStats([g.basic, g.pound, g.destroy, g.doublereload, g.slow]),
+                        COLOR: 9,
+                        BULLET_COLOR: 12,
+                        TYPE: "bullet",
+                    },
+                };
+                e.push(O);
+            }
+        }
+        return e;
+    })(),
+};
+
+exports.noorooAbility = makeAbility("nooroo", 15);
+exports.noorooGen = addAura(0, 1, 14, ["ability"]);
+exports.nooroo = {
+    PARENT: ["base"],
+    LABEL: "Nooroo",
+    COLOR: 14,
+    TURRETS: [
+        {
+            POSITION: [1, 0, 0, 0, 0, 1],
+            TYPE: "noorooGen",
+        },
+        {
+            POSITION: [10, 0, 0, 0, 360, 1],
+            TYPE: makeDeco(0, 17),
+        },
+    ],
+    GUNS: (() => {
+        let e = [];
+        for (let t = 0; t < 5; t++) {
+            let d = (360 / 5) * (t + 1);
+            for (let v = 0; v < 2; v++) {
+                e.push({
+                    POSITION: [10, 5, 1, 5, v == 1 ? -2.5 : 2.5, d, 0],
+                    PROPERTIES: {
+                        SHOOT_SETTINGS: combineStats([g.basic, g.pound, g.destroy, g.doublereload, g.slow]),
+                        COLOR: 9,
+                        BULLET_COLOR: 14,
+                        TYPE: "bullet",
+                    },
+                });
+            }
+        }
+        return e;
+    })(),
+};
+
+exports.plagg = addLSPF(exports.plagg, 140);
+exports.tikki = addLSPF(exports.tikki, 140);
+exports.nooroo = addLSPF(exports.nooroo, 140);
+
 // DEV "UPGRADE PATHS"
-exports.developer.UPGRADES_TIER_0 = ["basic", "healer", "spectator", "eggGenerator", "miscEntities", "bosses", "fun", "levels", "teams"];
+exports.developer.UPGRADES_TIER_0 = ["basic", "healer", "spectator", "eggGenerator", "miscEntities", "bosses", "fun", "special", "levels", "teams"];
+    exports.special.UPGRADES_TIER_0 = ["plagg", "tikki", "nooroo"];
     exports.eggGenerator.UPGRADES_TIER_0 = ["basic", "squareGenerator", "alphaPentagonGenerator", "crasherGenerator"];
     exports.miscEntities.UPGRADES_TIER_0 = ["baseProtector", "dominators", "mothership", "arenaCloser"];
         exports.dominators.UPGRADES_TIER_0 = ["dominator", "destroyerDominator", "gunnerDominator", "trapperDominator"];

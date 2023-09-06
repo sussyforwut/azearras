@@ -657,6 +657,176 @@ class io_wanderAroundMap extends IO {
     }
 }
 
+class io_ability extends IO {
+    constructor(body, opts = {}) {
+        super(body);
+        this.master = this.body.master;
+        this.ability = this.master.ability;
+        this.cap = false;
+        this.active = false;
+        this.healing = false;
+        if (opts.heal != null) this.healing = opts.heal;
+        else this.cap = true;
+        this.logged = [];
+        this.ids = [];
+        this.turrets = [];
+        this.speed = 0;
+        this.check = 10;
+        this.master.on("dead", () => this.destroyTurrets());
+    }
+    log() {
+        this.logged = [];
+        for (let i = 0; i < entities.length; i++) {
+            let e = entities[i];
+            if (
+                util.getDistance(this.master, e) < this.limit &&
+                !e.skipLife &&
+                (e.type == "tank" || e.type == "miniboss" || e.type == "food") &&
+                e.master.id != this.master.id &&
+                e.settings.hitsOwnType != "pushOnlyTeam" &&
+                e.alpha != 0 // e.team != this.master.team
+            ) {
+                if (e.team == this.master.team && this.healing) this.logged.push(e);
+                if (e.team != this.master.team) {
+                    if (!this.healing && !this.cap) this.logged.push(e);
+                    if (this.cap && e.type != "food") this.logged.push(e);
+                }
+            }
+        }
+        // For attack
+        if (!this.logged.length) return;
+        let log = this.logged;
+        let _cap = this.cap ? 1 : 8;
+        this.logged = [];
+        for (let i = 0; i < _cap; i++) {
+            let near = nearest(log, {
+                x: this.body.x,
+                y: this.body.y
+            });
+            this.logged.push(near);
+            if (log.length == 1) return;
+            else log.splice(log.indexOf(near), 1);
+        }
+    }
+    checkSave() {
+        for (let i = 0; i < this.logged.length; i++) {
+            if (this.ids.indexOf(this.logged[i].id) == -1) return true;
+        }
+        return false;
+    }
+    loop() {
+        if (this.ability.used == 2) this.log();
+        if (this.checkSave()) {
+            this.destroyTurrets();
+            this.logged.forEach(log => {
+                let o = new Entity(log, log);
+                o.define(this.cap ? Class.noorooAbility : this.healing ? Class.tikkiAbility : Class.plaggAbility);
+                // o.team = this.master.team;
+                // o.team = log.team;
+                o.SIZE = log.SIZE * 1.2;
+                this.turrets.push(o);
+            });
+            this.ids = [];
+            for (let i = 0; i < this.logged.length; i++) this.ids.push(this.logged[i].id);
+        }
+        for (let i = 0; i < this.turrets.length; i++) {
+            let e = this.turrets[i];
+            e.x = e.master.x;
+            e.y = e.master.y;
+            if (e.skill.level != e.master.skill.level) e.skill.level = e.master.skill.level;
+        }
+    }
+    destroyTurrets() {
+        for (let i = 0; i < this.turrets.length; i++) {
+            this.turrets[i].destroy();
+        }
+        this.turrets = [];
+    }
+    setControl(entity) {
+        entity.controlled.color = entity.color;
+        entity.controlled.skill = [...entity.skill.raw];
+        entity.controlled.level = entity.level;
+        entity.controlled.team = entity.team;
+    }
+    do() {
+        for (let i = 0; i < this.logged.length; i++) {
+            let e = this.logged[i];
+            if (this.healing) {
+                e.shield.amount = e.shield.max;
+                e.health.amount = e.health.max;
+            }
+            else if (this.cap) {
+                if (!e.isBot) {
+                    e.controllers = [
+                        new ioTypes.nearestDifferentMaster(e),
+                        new ioTypes.wanderAroundMap(e, { immitatePlayerMovement: true, lookAtGoal: true }),
+                        new ioTypes.mapTargetToGoal(e),
+                    ];
+                    e.socket.talk("f");
+                }
+                this.setControl(e);
+                e.define({
+                    LEVEL: (e.skill.maxSkillPoints - 45) * 3 + 45,
+                    TEAM: this.master.team
+                });
+                e.skill.set(e.skill.caps);
+                e.color = this.master.color;
+                e.name += "[CONTROLLED]";
+            }
+            else {
+                e.shield.amount *= 0.1;
+                if (e.health.amount < e.health.max * 0.2) {
+                    e._killers.push(this.master);
+                    e.kill();
+                }
+                else e.health.amount *= 0.1;
+            }
+        }
+    }
+    activate() {
+        this.check++;
+        if (this.check > 1000 / room.cycleSpeed && this.active) {
+            this.ability.used++;
+            switch (this.ability.used) {
+                case 1:
+                    this.logged = [this.master];
+                    break;
+                case 3:
+                    this.ability.used = 0;
+                    this.active = false;
+                    this.ability.timer = 0.1 * 60000 / room.cycleSpeed;
+                    this.do();
+                    this.destroyTurrets();
+                    break;
+            }
+            this.check = 0;
+        }
+    }
+    think(input) {
+        this.limit = this.master.realSize * 25;
+        this.showLimit = this.master.realSize * 1.1;
+        if (input.alt && !this.active) this.active = true;
+        if (this.ability.timer < 1) {
+            this.activate();
+        }
+        this.loop();
+        if (this.ability.timer > 0 || this.ability.used > 0) {
+            if (this.ability.timer > 0) this.ability.timer--;
+            if (this.body.SIZE > 1) {
+                this.body.SIZE -= this.speed;
+                this.speed += 0.02;
+                if (this.body.SIZE < 1) this.body.SIZE = 1;
+            } else this.speed = 0;
+        }
+        else if (this.body.SIZE < this.showLimit) {
+            this.body.SIZE += this.speed;
+            this.speed += 0.02;
+        }
+        else if (this.body.SIZE > this.showLimit) this.body.SIZE = this.showLimit;
+        else this.speed = 0;
+    }
+}
+
 let ioTypes = {
     //misc
     zoom: io_zoom,
@@ -665,6 +835,7 @@ let ioTypes = {
     alwaysFire: io_alwaysFire,
     mapAltToFire: io_mapAltToFire,
     mapFireToAlt: io_mapFireToAlt,
+    ability: io_ability,
 
     //aiming related
     nearestDifferentMaster: io_nearestDifferentMaster,

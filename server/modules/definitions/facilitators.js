@@ -655,7 +655,39 @@ exports.addLSPF = (type, skill_points) => {
     return output;
 }
 
-exports.addAura = (damageFactor = 1, sizeFactor = 1, auraColor) => {
+exports.makeAbility = (label, color) => {
+    return {
+        PARENT: ["genericTank"],
+        LABEL: label + " Ability",
+        FACING_TYPE: "autospin",
+        ALPHA: [0, 0],
+        ACCEPTS_SCORE: false,
+        CAN_BE_ON_LEADERBOARD: false,
+        SHAPE: 0,
+        GUNS: (() => {
+            let e = [],
+                angle = 360 / 30;
+            for (let i = 0; i < 30; i++) {
+                e.push({
+                    POSITION: [0, 6.5, 1, -50 + -Math.random(), 0, angle * i, Math.random()],
+                    PROPERTIES: {
+                        TYPE: ["bullet", {
+                            DIE_AT_LOW_SPEED: true,
+                            MOTION_TYPE: "slow",
+                        }],
+                        ALPHA: 1,
+                        AUTOFIRE: true,
+                        BULLET_COLOR: color,
+                        SHOOT_SETTINGS: exports.combineStats([g.basic, g.halfreload])
+                    }
+                })
+            }        
+            return e;
+        })(),
+    };
+}
+
+exports.addAura = (damageFactor = 1, sizeFactor = 1, auraColor, controllers = []) => {
     let isHeal = damageFactor < 0;
     let auraType = isHeal ? "healAura" : "aura";
     let symbolType = isHeal ? "healerSymbol" : "auraSymbol";
@@ -669,7 +701,10 @@ exports.addAura = (damageFactor = 1, sizeFactor = 1, auraColor) => {
                 POSITION: [0, 20, 1, 0, 0, 0, 0,],
                 PROPERTIES: {
                     SHOOT_SETTINGS: exports.combineStats([g.aura, [1, 1, 1, sizeFactor, 1, damageFactor, 1, 1, 1, 1, 1, 1, 1]]),
-                    TYPE: [auraType, {COLOR: auraColor}],
+                    TYPE: [auraType, { 
+                        COLOR: auraColor,
+                        CONTROLLERS: controllers,
+                    }],
                     MAX_CHILDREN: 1,
                     AUTOFIRE: true,
                     SYNCS_SKILLS: true,
@@ -679,7 +714,7 @@ exports.addAura = (damageFactor = 1, sizeFactor = 1, auraColor) => {
         TURRETS: [
             {
                 POSITION: [20 - 5 * isHeal, 0, 0, 0, 360, 1],
-                TYPE: [symbolType, {COLOR: auraColor}],
+                TYPE: [symbolType, { COLOR: auraColor }],
             },
         ]
     };
