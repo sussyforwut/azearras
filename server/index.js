@@ -530,7 +530,7 @@ class FoodType {
         }
         this.types = types;
         this.chances = chances;
-        this.chance = chance * (scale > 4 && c.SHINY_SCALE != 0 ? c.SHINY_SCALE * 20 : 1); // 20 = 2000 / 100
+        this.chance *= (scale > 4 && c.SHINY_SCALE) ? c.SHINY_SCALE * 20 : 1; // 20 = 2000 / 100
         this.isNestFood = isNestFood;
     }
     choose() {
@@ -631,14 +631,9 @@ function spawnNestFood() {
     shape.isNestFood = true;
 }
 const makefood = () => {
-    const maxFood =
-        Math.sqrt(c.FOOD_AMOUNT) +
-        (Math.sqrt(room.width * room.height) / c.FOOD_AMOUNT) * views.length;
-    const maxNestFood =
-        maxFood *
-        (room["nest"].length / (room.xgrid * room.ygrid)) *
-        c.NEST_FOOD_AMOUNT;
-    const census = (() => {
+    const maxFood = Math.sqrt(c.FOOD_AMOUNT) + views.length * Math.sqrt(room.width * room.height) / c.FOOD_AMOUNT,
+        maxFoodNest = maxFood * c.FOOD_AMOUNT_NEST * room["nest"].length / (room.xgrid * room.ygrid),
+    census = (() => {
         let food = 0;
         let nestFood = 0;
         for (let instance of entities) {
@@ -647,10 +642,7 @@ const makefood = () => {
                 else food++;
             }
         }
-        return {
-            food,
-            nestFood,
-        };
+        return { food, nestFood };
     })();
     if (census.food < maxFood) {
         for (let i = 0; i < maxFood - census.food; i++) {
@@ -663,8 +655,8 @@ const makefood = () => {
             }
         }
     }
-    if (census.nestFood < maxNestFood) {
-        for (let i = 0; i < maxNestFood - census.nestFood; i++) {
+    if (census.nestFood < maxFoodNest) {
+        for (let i = 0; i < maxFoodNest - census.nestFood; i++) {
             if (Math.random() > 0.75) {
                 spawnNestFood();
             }
