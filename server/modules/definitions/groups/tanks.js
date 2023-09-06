@@ -1,4 +1,4 @@
-const { combineStats, makeAuto, makeHybrid, makeOver, makeDeco, makeGuard } = require('../facilitators.js');
+const { combineStats, makeAuto, makeHybrid, makeOver, makeDeco, makeGuard, addLSPF } = require('../facilitators.js');
 const { base, statnames, gunCalcNames, dfltskl, smshskl } = require('../constants.js');
 const generics = require('./generics.js');
 const g = require('../gunvals.js');
@@ -1339,6 +1339,8 @@ exports.smasher = {
     SKILL_CAP: [smshskl, 0, 0, 0, 0, smshskl, smshskl, smshskl, smshskl, smshskl],
     STAT_NAMES: statnames.smasher,
 };
+if (c.LEVEL_CAP > c.LEVEL_CHEAT_CAP) exports.smasher = addLSPF(exports.smasher, 72);
+
 exports.healer = {
     PARENT: ["genericTank"],
     LABEL: "Healer",
@@ -5353,6 +5355,12 @@ exports.landmine = {
     SKILL_CAP: [smshskl, 0, 0, 0, 0, smshskl, smshskl, smshskl, smshskl, smshskl],
     STAT_NAMES: statnames.smasher,
 };
+if (c.LEVEL_CAP > c.LEVEL_CHEAT_CAP) {
+    exports.megaSmasher = addLSPF(exports.megaSmasher, 72);
+    exports.landmine = addLSPF(exports.landmine, 72);
+    exports.spike = addLSPF(exports.spike, 72);
+    exports.autoSmasher = addLSPF(exports.autoSmasher, 120);
+}
 
 // HEALER UPGRADES
 exports.medic = {

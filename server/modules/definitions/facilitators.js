@@ -642,6 +642,19 @@ exports.makeDeco = (shape = 0, color = 16) => {
     };
 }
 
+exports.addLSPF = (type, skill_points) => {
+    let output = exports.dereference(type);
+    output.LEVEL_SKILL_POINT_FUNCTION = level => {
+        if (level < 2) return 0;
+        if (level <= 40) return 1;
+        if (level <= 45 && level & 1 == 1) return 1;
+        if (level % 3 == 1 && level < (skill_points - 45) * 3 + 45) return 1;
+        return 0;
+    };
+    output.RECALC_SKILL = true;
+    return output;
+}
+
 exports.addAura = (damageFactor = 1, sizeFactor = 1, auraColor) => {
     let isHeal = damageFactor < 0;
     let auraType = isHeal ? "healAura" : "aura";

@@ -966,6 +966,7 @@ class Entity extends EventEmitter {
             this.isArenaCloser = false;
             this.ac = false;
             this.alpha = 1;
+            this.skill.LSPF = null;
             this.skill.reset();
             this.reset();
         }

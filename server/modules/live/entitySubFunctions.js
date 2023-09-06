@@ -25,6 +25,7 @@ class Skill {
         // Just skill stuff.
         this.raw = inital;
         this.caps = [];
+        this.LSPF = null;
         this.setCaps([ c.MAX_SKILL, c.MAX_SKILL, c.MAX_SKILL, c.MAX_SKILL, c.MAX_SKILL, c.MAX_SKILL, c.MAX_SKILL, c.MAX_SKILL, c.MAX_SKILL, c.MAX_SKILL ]);
         this.name = [
             "Reload",
@@ -60,7 +61,6 @@ class Skill {
         this.deduction = 0;
         this.level = 0;
         this.canUpgrade = false;
-        this.LSPF = null;
         this.set([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
         this.maintain();
     }

@@ -1,5 +1,5 @@
 const { base, statnames, gunCalcNames, smshskl } = require('../constants.js');
-const { combineStats, skillSet, makeAuto, makeDeco } = require('../facilitators.js');
+const { combineStats, skillSet, makeAuto, makeDeco, addLSPF } = require('../facilitators.js');
 const { trapper } = require('./tanks.js');
 const g = require('../gunvals.js');
 
@@ -1000,6 +1000,8 @@ exports.weirdSpike = {
         },
     ],
 };
+if (c.LEVEL_CAP > c.LEVEL_CHEAT_CAP) exports.weirdSpike = addLSPF(exports.weirdSpike, 72);
+
 exports.master = {
     PARENT: ["genericTank"],
     LABEL: "Master",
