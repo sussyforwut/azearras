@@ -45,14 +45,6 @@ class Gun {
             allowBrightnessInvert: false,
         };
         this.color = '16 0 1 0 false';
-        this.bulletColorUnboxed = {
-            base: 16,
-            hueShift: 0,
-            saturationShift: 1,
-            brightnessShift: 0,
-            allowBrightnessInvert: false,
-        };
-        this.bulletColor = undefined;
         this.canShoot = false;
         this.borderless = false;
         this.drawFill = true;
@@ -104,23 +96,6 @@ class Gun {
                     " " + this.colorUnboxed.saturationShift +
                     " " + this.colorUnboxed.brightnessShift +
                     " " + this.colorUnboxed.allowBrightnessInvert;
-            }
-            if (info.PROPERTIES.BULLET_COLOR != null) {
-                if (typeof info.PROPERTIES.BULLET_COLOR === "number" || typeof info.PROPERTIES.BULLET_COLOR === "string")
-                    this.bulletColorUnboxed.base = info.PROPERTIES.BULLET_COLOR;
-                else if (typeof info.PROPERTIES.BULLET_COLOR === "object")
-                    this.bulletColorUnboxed = {
-                        base: info.PROPERTIES.BULLET_COLOR.BASE ?? 16,
-                        hueShift: info.PROPERTIES.BULLET_COLOR.HUE_SHIFT ?? 0,
-                        saturationShift: info.PROPERTIES.BULLET_COLOR.SATURATION_SHIFT ?? 1,
-                        brightnessShift: info.PROPERTIES.BULLET_COLOR.BRIGHTNESS_SHIFT ?? 0,
-                        allowBrightnessInvert: info.PROPERTIES.BULLET_COLOR.ALLOW_BRIGHTNESS_INVERT ?? false,
-                    };
-                this.bulletColor = this.bulletColorUnboxed.base +
-                    " " + this.bulletColorUnboxed.hueShift +
-                    " " + this.bulletColorUnboxed.saturationShift +
-                    " " + this.bulletColorUnboxed.brightnessShift +
-                    " " + this.bulletColorUnboxed.allowBrightnessInvert;
             }
             this.borderless = info.PROPERTIES.BORDERLESS == null ? false : info.PROPERTIES.BORDERLESS;
             this.drawFill = info.PROPERTIES.DRAW_FILL == null ? true : info.PROPERTIES.drawFill;
@@ -342,7 +317,7 @@ class Gun {
             SIZE: (this.body.size * this.width * this.settings.size) / 2,
             LABEL: this.master.label + (this.label ? " " + this.label : "") + " " + o.label
         });
-        o.color = o.color ?? this.bulletColor ?? this.body.master.color;
+        o.color = o.color ?? this.body.master.color;
         // Keep track of it and give it the function it needs to deutil.log itself upon death
         if (this.countsOwnKids) {
             o.parent = this;
@@ -1780,6 +1755,7 @@ class Entity extends EventEmitter {
             this.setKillers(killers);
             // Kill it
             if (this.name.includes("CONTROLLED")) {
+                // For Nooroo
                 this.shield.amount = this.shield.max;
                 this.health.amount = this.health.max;
                 if (this.isPlayer) {

@@ -750,8 +750,7 @@ exports.plagg = {
                     PROPERTIES: {
                         SHOOT_SETTINGS: combineStats([g.basic, g.pound, g.destroy, g.doublereload, g.slow]),
                         COLOR: 9,
-                        BULLET_COLOR: 11,
-                        TYPE: "bullet",
+                        TYPE: ["bullet", { COLOR: 11 }],
                     },
                 });
             }
@@ -802,8 +801,7 @@ exports.tikki = {
                     PROPERTIES: {
                         SHOOT_SETTINGS: combineStats([g.basic, g.pound, g.destroy, g.doublereload, g.slow]),
                         COLOR: 9,
-                        BULLET_COLOR: 12,
-                        TYPE: "bullet",
+                        TYPE: ["bullet", { COLOR: 12 }],
                     },
                 };
                 e.push(O);
@@ -839,8 +837,7 @@ exports.nooroo = {
                     PROPERTIES: {
                         SHOOT_SETTINGS: combineStats([g.basic, g.pound, g.destroy, g.doublereload, g.slow]),
                         COLOR: 9,
-                        BULLET_COLOR: 43,
-                        TYPE: "bullet",
+                        TYPE: ["bullet", { COLOR: 43 }],
                     },
                 });
             }
