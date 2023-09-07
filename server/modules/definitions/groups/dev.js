@@ -760,7 +760,7 @@ exports.plagg = {
     })(),
 };
 
-exports.tikkiAbility = makeAbility("tikki", 5);
+exports.tikkiAbility = makeAbility("tikki", 42);
 exports.tikkiGen = addAura(0, 1, 12, [["ability", { heal: true }]]);
 exports.tikki = {
     PARENT: ["base"],
@@ -818,15 +818,15 @@ exports.noorooGen = addAura(0, 1, 14, ["ability"]);
 exports.nooroo = {
     PARENT: ["base"],
     LABEL: "Nooroo",
-    COLOR: 14,
+    COLOR: 43,
     TURRETS: [
         {
             POSITION: [1, 0, 0, 0, 0, 1],
             TYPE: "noorooGen",
         },
         {
-            POSITION: [10, 0, 0, 0, 360, 1],
-            TYPE: makeDeco(0, 17),
+            POSITION: [12, 0, 0, 0, 360, 1],
+            TYPE: makeDeco(0, 7),
         },
     ],
     GUNS: (() => {
@@ -839,7 +839,7 @@ exports.nooroo = {
                     PROPERTIES: {
                         SHOOT_SETTINGS: combineStats([g.basic, g.pound, g.destroy, g.doublereload, g.slow]),
                         COLOR: 9,
-                        BULLET_COLOR: 14,
+                        BULLET_COLOR: 43,
                         TYPE: "bullet",
                     },
                 });

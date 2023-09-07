@@ -419,6 +419,12 @@ function getColor(colorNumber) {
         case 41:
         case "tree":
             return "#267524";
+        case 42:
+        case "tikkiAbility":
+            return "#ff2190";
+        case 43:
+        case "nooroo":
+            return "#c8a6ff";
         default:
             return "#00000000";
     }
