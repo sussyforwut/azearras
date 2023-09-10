@@ -124,6 +124,7 @@ exports.food = {
         STEALTH: 30,
         PUSHABILITY: 1,
     },
+    MAX_SKILL: 45,
     DAMAGE_EFFECTS: false,
     RATEFFECTS: false,
     HEALTH_WITH_LEVEL: false,

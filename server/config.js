@@ -124,7 +124,7 @@ module.exports = {
     // Natural Spawns
 
     // Something about the likeliness of shinies, idk.
-    SHINY_SCALE: 0,
+    SHINY_SCALE: 1,
 
     // How much food to spawn. Not an exact amount.
     FOOD_AMOUNT: 100,

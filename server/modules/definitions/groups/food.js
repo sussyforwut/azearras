@@ -69,6 +69,7 @@ makeRelic = (type, scale = 1, gem, SIZE) => {
     return {
         PARENT,
         LABEL: type.LABEL + ' Relic',
+        MAX_SKILL: 45,
         COLOR: 18, // This is the color of the floor, this makes it look hollow.
         BODY: {
             ACCELERATION: 0.001

@@ -529,7 +529,7 @@ class FoodType {
         }
         this.types = types;
         this.chances = chances;
-        this.chance *= (scale > 4 && c.SHINY_SCALE) ? c.SHINY_SCALE * 20 : 1; // 20 = 2000 / 100
+        this.chance = chance * (scale > 4 ? c.SHINY_SCALE : 1);
         this.isNestFood = isNestFood;
     }
     choose() {
@@ -539,31 +539,31 @@ class FoodType {
 const foodTypes = [
     new FoodType("Normal Food",
         [Class.egg, Class.square, Class.triangle, Class.pentagon, Class.betaPentagon, Class.alphaPentagon],
-        ["scale", 4], 2000
+        ["scale", 4], 1000
     ),
     new FoodType("Shiny Food",
         [Class.gem, Class.shinySquare, Class.shinyTriangle, Class.shinyPentagon, Class.shinyBetaPentagon, Class.shinyAlphaPentagon],
-        ["scale", 5], 1
+        ["scale", 5], 0.5
     ),
     new FoodType("Legendary Food",
         [Class.jewel, Class.legendarySquare, Class.legendaryTriangle, Class.legendaryPentagon, Class.legendaryBetaPentagon, Class.legendaryAlphaPentagon],
-        ["scale", 6], 0.1
+        ["scale", 5], 0.1
     ),
     new FoodType("Shadow Food",
         [Class.shadowSquare, Class.shadowTriangle, Class.shadowPentagon, Class.shadowBetaPentagon, Class.shadowAlphaPentagon],
-        ["scale", 7], 0.005
+        ["scale", 6], 0.05
     ),
     new FoodType("Rainbow Food",
         [Class.rainbowSquare, Class.rainbowTriangle, Class.rainbowPentagon, Class.rainbowBetaPentagon, Class.rainbowAlphaPentagon],
-        ["scale", 8], 0.001
+        ["scale", 6], 0.01
     ),
     new FoodType("Trans Food",
         [Class.egg, Class.transSquare, Class.transTriangle, Class.transPentagon, Class.transBetaPentagon, Class.transAlphaPentagon],
-        ["scale", 9], 0.0005
+        ["scale", 7], 0.005
     ),
     new FoodType("Extradimensional Food",
         [Class.sphere, Class.cube, Class.tetrahedron, Class.octahedron, Class.dodecahedron, Class.icosahedron],
-        ["scale", 10], 0.0001
+        ["scale", 7], 0.001
     ),
     new FoodType("Nest Food", // Commented out because stats aren't done yet.
         [Class.pentagon, Class.betaPentagon, Class.alphaPentagon, /*Class.alphaHexagon, Class.alphaHeptagon, Class.alphaOctogon, Class.alphaNonagon, Class.alphaDecagon, Class.icosagon*/],
