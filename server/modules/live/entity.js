@@ -1042,7 +1042,7 @@ class Entity extends EventEmitter {
             this.skill.score = score;
             while (this.skill.maintain()) {}
         }
-        if (set.MAX_SKILL) this.max_points += set.MAX_SKILL;
+        if (set.MAX_SKILL) this.max_points = set.MAX_SKILL;
         if (set.EXTRA_SKILL) this.skill.points += set.EXTRA_SKILL;
         if (set.BODY != null) {
             if (set.BODY.ACCELERATION != null) this.ACCELERATION = set.BODY.ACCELERATION;
