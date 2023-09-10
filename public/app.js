@@ -965,7 +965,6 @@ const drawEntity = (drawingEntities, baseColor, x, y, instance, ratio, alpha = 1
     for (let i = 0; i < m.turrets.length; i++) {
         let turretFacesClient = m.turrets[i].turretFacesClient
         let t = m.turrets[i];
-        let isAutospinning = global.autoSpin
         source.turrets[i].lerpedFacing == undefined
             ? (source.turrets[i].lerpedFacing = source.turrets[i].facing)
             : (source.turrets[i].lerpedFacing = util.lerpAngle(source.turrets[i].lerpedFacing, source.turrets[i].facing, 0.1, true));
@@ -973,11 +972,8 @@ const drawEntity = (drawingEntities, baseColor, x, y, instance, ratio, alpha = 1
             let ang = t.direction + t.angle + rot,
                 len = t.offset * drawSize,
                 facing = 0
-            if (isAutospinning && turretFacesClient) {
-                facing = instance.render.f + turretsObeyRot * rot + t.angle;
-            } else
             if (turretFacesClient && drawingEntities) {
-                facing = Math.atan2(global.target.y, global.target.x) + turretsObeyRot * rot + t.angle;
+                facing = instance.render.f + turretsObeyRot * rot + t.angle
             } else {
                 facing = source.turrets[i].lerpedFacing + turretsObeyRot * rot;
             }
@@ -1023,16 +1019,12 @@ const drawEntity = (drawingEntities, baseColor, x, y, instance, ratio, alpha = 1
     for (let i = 0; i < m.turrets.length; i++) {
         let t = m.turrets[i];
         let turretFacesClient = m.turrets[i].turretFacesClient
-        let isAutospinning = global.autoSpin
         if (t.layer) {
             let ang = t.direction + t.angle + rot,
                 len = t.offset * drawSize,
                 facing = 0
-            if (isAutospinning && turretFacesClient) {
-                facing = instance.render.f + turretsObeyRot * rot + t.angle;
-            } else
             if (turretFacesClient && drawingEntities) {
-                facing = Math.atan2(global.target.y, global.target.x) + turretsObeyRot * rot + t.angle;
+                facing = instance.render.f + turretsObeyRot * rot + t.angle
             } else {
                 facing = source.turrets[i].lerpedFacing + turretsObeyRot * rot;
             }
@@ -1392,7 +1384,7 @@ function drawEntities(px, py, ratio) {
                 alpha = Math.max(0, Math.min(1000, chat.expires - now) / 1000);
 
             ctx.globalAlpha = 0.5 * alpha;
-            drawBar(x - msgLength / 2, x + msgLength / 2, y, 30, getColor(instance.color));
+            drawBar(x - msgLength / 2, x + msgLength / 2, y, 30, modifyColor(instance.color));
             ctx.globalAlpha = alpha;
             config.graphical.fontStrokeRatio *= 1.2;
             drawText(text, x, y + 7, 15, color.guiwhite, "center");
