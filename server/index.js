@@ -524,9 +524,8 @@ class FoodType {
                 chances.push(i ** scale);
             }
         }
-        this.name = groupName;
         if (types.length !== chances.length) {
-            throw new RangeError(groupName + ": error with group. Please make sure there is the same number of types as chances.");
+            throw new RangeError(groupName + " Error: Amount of types and amount of chances are not equal.");
         }
         this.types = types;
         this.chances = chances;
@@ -558,11 +557,10 @@ const foodTypes = [
         [Class.rainbowSquare, Class.rainbowTriangle, Class.rainbowPentagon, Class.rainbowBetaPentagon, Class.rainbowAlphaPentagon],
         ["scale", 8], 0.001
     ),
-    // Commented out because stats aren't done yet.
-    // new FoodType("Trans Food",
-    //     [Class.egg],
-    //     ["scale", 9], 0.0005
-    // ),
+    new FoodType("Trans Food",
+        [Class.egg, Class.transSquare, Class.transTriangle, Class.transPentagon, Class.transBetaPentagon, Class.transAlphaPentagon],
+        ["scale", 9], 0.0005
+    ),
     new FoodType("Extradimensional Food",
         [Class.sphere, Class.cube, Class.tetrahedron, Class.octahedron, Class.dodecahedron, Class.icosahedron],
         ["scale", 10], 0.0001
@@ -586,11 +584,6 @@ function spawnShape(location, type = 0) {
     let o = new Entity(location);
     type = foodTypes[type].choose();
     o.define(type);
-    o.define({
-        BODY: {
-            ACCELERATION: 0.015 / (type.FOOD.LEVEL + 1),
-        },
-    });
     o.facing = ran.randomAngle();
     o.team = TEAM_ENEMIES;
     return o;
@@ -681,7 +674,10 @@ const maintainloop = () => {
 };
 
 // Bring it to life
+//TODO: compress all of these intervals into one big one
 setInterval(gameloop, room.cycleSpeed);
+setInterval(chatLoop, 1000);
 setInterval(maintainloop, 1000);
 setInterval(speedcheckloop, 1000);
 setInterval(gamemodeLoop, 33.33);
+setInterval(roomLoop, 40);

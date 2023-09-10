@@ -209,8 +209,9 @@ exports.spawnedAlphaPentagon = {
 // GENERATORS
 exports.generatorBase = {
     PARENT: ["genericTank"],
-    SKILL_CAP: [15, 0, 0, 0, 0, 0, 0, 0, 0, 15],
-    INVISIBLE: [0.01, 0.1],
+    SKILL_CAP: [31, 0, 0, 0, 0, 0, 0, 0, 0, 31],
+    ALPHA: [0, 0],
+    IGNORED_BY_AI: true
 };
 exports.eggGenerator = {
     PARENT: ["generatorBase"],
@@ -324,6 +325,84 @@ exports.crasherGenerator = {
     ],
 };
 
+function compileMatrix(matrix, matrix2Entrance) {
+    let matrixWidth = matrix[0].length,
+        matrixHeight = matrix.length;
+    for (let x = 0; x < matrixWidth; x++) for (let y = 0; y < matrixHeight; y++) {
+        let str = matrix[y][x],
+            LABEL = str[0].toUpperCase() + str.slice(1).replace(/[A-Z]/g, m => ' ' + m) + " Generator",
+            code = str + 'Generator';
+        exports[code] = matrix[y][x] = {
+            PARENT: ["generatorBase"],
+            LABEL,
+            TURRETS: [{
+                POSITION: [5 + y * 2, 0, 0, 0, 0, 1],
+                TYPE: str,
+            }],
+            GUNS: [{
+                POSITION: [14, 12, 1, 4, 0, 0, 0],
+                PROPERTIES: {
+                    SHOOT_SETTINGS: combineStats([g.basic, g.fake]),
+                    TYPE: "bullet"
+                }
+            }, {
+                POSITION: [12, 12, 1.4, 4, 0, 0, 0],
+                PROPERTIES: {
+                    SHOOT_SETTINGS: combineStats([g.basic, { recoil: 0 }]),
+                    INDEPENDENT_CHILDREN: true,
+                    TYPE: str
+                },
+            }],
+        };
+    }
+}
+
+function connectMatrix(matrix, matrix2Entrance) {
+    let matrixWidth = matrix[0].length,
+        matrixHeight = matrix.length;
+    for (let x = 0; x < matrixWidth; x++) for (let y = 0; y < matrixHeight; y++) {
+        let top = (y + matrixHeight - 1) % matrixHeight,
+            bottom = (y + matrixHeight + 1) % matrixHeight,
+            left = (x + matrixWidth - 1) % matrixWidth,
+            right = (x + matrixWidth + 1) % matrixWidth,
+
+        center = matrix[y     ][x    ];
+        top    = matrix[top   ][x    ];
+        bottom = matrix[bottom][x    ];
+        left   = matrix[y     ][left ];
+        right  = matrix[y     ][right];
+
+        matrix[y][x].UPGRADES_TIER_0 = [
+            "basic"     , top    , "developer",
+             left       , center , right      ,
+            "spectator" , bottom , matrix2Entrance
+        ];
+    }
+}
+let generatorMatrix = [
+    [ "egg"           , "gem"                , "jewel"                  , "crasher"             , "sentry"               , "shinySentry"        , "EggRelic"           ],
+    [ "square"        , "shinySquare"        , "legendarySquare"        , "shadowSquare"        , "rainbowSquare"        , "transSquare"        , "SquareRelic"        ],
+    [ "triangle"      , "shinyTriangle"      , "legendaryTriangle"      , "shadowTriangle"      , "rainbowTriangle"      , "transTriangle"      , "TriangleRelic"      ],
+    [ "pentagon"      , "shinyPentagon"      , "legendaryPentagon"      , "shadowPentagon"      , "rainbowPentagon"      , "transPentagon"      , "PentagonRelic"      ],
+    [ "betaPentagon"  , "shinyBetaPentagon"  , "legendaryBetaPentagon"  , "shadowBetaPentagon"  , "rainbowBetaPentagon"  , "transBetaPentagon"  , "BetaPentagonRelic"  ],
+    [ "alphaPentagon" , "shinyAlphaPentagon" , "legendaryAlphaPentagon" , "shadowAlphaPentagon" , "rainbowAlphaPentagon" , "transAlphaPentagon" , "AlphaPentagonRelic" ],
+    [ "sphere"        , "cube"               , "tetrahedron"            , "octahedron"          , "dodecahedron"         , "icosahedron"        , "tesseract"          ],
+],
+
+gemRelicMatrix = [];
+for (let tier of [ "", "Egg", "Square", "Triangle", "Pentagon", "BetaPentagon", "AlphaPentagon" ]) {
+    let row = [];
+    for (let gem of [ "Power", "Space", "Reality", "Soul", "Time", "Mind" ]) {
+        row.push(gem + (tier ? tier + 'Relic' : 'Gem'));
+    }
+    gemRelicMatrix.push(row);
+}
+
+compileMatrix(generatorMatrix);
+compileMatrix(gemRelicMatrix);
+connectMatrix(generatorMatrix, 'PowerGemGenerator');
+connectMatrix(gemRelicMatrix, 'eggGenerator');
+
 exports.diamondShape = {
     PARENT: ["basic"],
     LABEL: "Diamond Test Shape",
@@ -417,6 +496,7 @@ exports.colorMan = {
 
 exports.miscTestHelper2 = {
     PARENT: ["genericTank"],
+    TURRET_FACES_CLIENT: true,
     COLOR: -1,
     GUNS: [
         {
@@ -431,6 +511,7 @@ exports.miscTestHelper2 = {
 };
 exports.miscTestHelper = {
     PARENT: ["genericTank"],
+    TURRET_FACES_CLIENT: true,
     COLOR: {
         BASE: -1,
         BRIGHTNESS_SHIFT: 15,
@@ -460,7 +541,7 @@ exports.miscTest = {
             POSITION: [18, 8, 1, 0, 0, 0, 0],
             PROPERTIES: {
                 SHOOT_SETTINGS: combineStats([g.basic, g.noRandom]),
-                TYPE: "kronosMissile",
+                TYPE: "bullet",
             },
         },
     ],
@@ -662,6 +743,12 @@ exports.godbasic = {
         },
     ],
 };
+exports.maximumOverdrive = {
+    PARENT: ["overdrive"],
+    LABEL: "Maximum Overdrive",
+    SKILL_CAP: Array(10).fill(255),
+    SKILL: Array(10).fill(255),
+};
 
 exports.levels = {
     PARENT: ["menu"],
@@ -851,9 +938,8 @@ exports.tikki = addLSPF(exports.tikki, 140);
 exports.nooroo = addLSPF(exports.nooroo, 140);
 
 // DEV "UPGRADE PATHS"
-exports.developer.UPGRADES_TIER_0 = ["basic", "healer", "spectator", "eggGenerator", "miscEntities", "bosses", "fun", "special", "levels", "teams"];
+exports.developer.UPGRADES_TIER_0 = ["basic", "healer", "spectator", "miscEntities", "eggGenerator", "bosses", "fun", "special", "levels", "teams"];
     exports.special.UPGRADES_TIER_0 = ["plagg", "tikki", "nooroo"];
-    exports.eggGenerator.UPGRADES_TIER_0 = ["basic", "squareGenerator", "alphaPentagonGenerator", "crasherGenerator"];
     exports.miscEntities.UPGRADES_TIER_0 = ["baseProtector", "dominators", "mothership", "arenaCloser"];
         exports.dominators.UPGRADES_TIER_0 = ["dominator", "destroyerDominator", "gunnerDominator", "trapperDominator"];
     exports.bosses.UPGRADES_TIER_0 = ["sentries", "elites", "mysticals", "nesters", "rogues", "terrestrials", "celestials", "eternals"];
@@ -867,4 +953,4 @@ exports.developer.UPGRADES_TIER_0 = ["basic", "healer", "spectator", "eggGenerat
         exports.eternals.UPGRADES_TIER_0 = [/*"ragnarok",*/ "kronos"];
     exports.oldTanks.UPGRADES_TIER_0 = ["oldSpreadshot", "oldBentBoomer", "quadBuilder", "weirdSpike", "master", "oldCommander", "blunderbuss", "oldRimfire"];
     exports.scrappedTanks.UPGRADES_TIER_0 = ["autoTrapper", "oldDreadnought", "mender", "prodigy"];
-    exports.fun.UPGRADES_TIER_0 = ["vanquisher", "armyOfOne", "godbasic", "diamondShape", "rotatedTrap", "mummifier", "colorMan", "miscTest", "auraBasic", "auraHealer"];
+    exports.fun.UPGRADES_TIER_0 = ["vanquisher", "armyOfOne", "godbasic", "maximumOverdrive", "diamondShape", "rotatedTrap", "mummifier", "colorMan", "miscTest", "auraBasic", "auraHealer"];

@@ -1,9 +1,7 @@
 # Open Source Arras
 Formerly (and commonly) known as APS++
 
-This is an open beta build of an advanced private server template for Arras.io, independent from the official client. If you're familiar with `arras-template`, you'll be familiar with this.
-
-**This is *not* representative of the final product. Some things may not either be present or work correctly.**
+This is an open beta build of an advanced private server template for Arras.io, independent from the official client. This is **not** representative of the final product. Some things may not either be present or work correctly.
 
 ## Requirements
 
@@ -11,7 +9,9 @@ In order to run your server via localhost, you will need to install these first:
 - [Node.js v16 or later](https://nodejs.org/en)
 - [ws](https://www.npmjs.com/package/ws)
 
-Once the required software is installed, open run.bat. If there aren't any errors, your server will start up. Go to localhost:3000 in your favourite web browser (keep the command prompt open, closing it will shut down the server) to play.
+Once the required software is installed, open either run.bat (if you're on Windows) or run.sh (if you're not). If there aren't any errors, your server will start up. Go to localhost:3000 in your favourite web browser (keep the command prompt open, closing it will shut down the server) to play.
+
+If you want to stay up to date, fork this template, download a git client, and sync the fork whenever there's a major update.
 
 ## Useful Tools
 
