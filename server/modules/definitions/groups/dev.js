@@ -875,7 +875,7 @@ exports.base = {
 };
 
 exports.plaggAbility = makeAbility("plagg", 9);
-exports.plaggGen = addAura(0, 1, 11, [["ability", { heal: false }]]);
+exports.plaggGen = addAura(0, 1, 11, [["ability", { type: "damage" }]]);
 exports.plagg = {
     PARENT: ["base"],
     LABEL: "Plagg",
@@ -910,7 +910,7 @@ exports.plagg = {
 };
 
 exports.tikkiAbility = makeAbility("tikki", 42);
-exports.tikkiGen = addAura(0, 1, 12, [["ability", { heal: true }]]);
+exports.tikkiGen = addAura(0, 1, 12, [["ability", { type: "heal" }]]);
 exports.tikki = {
     PARENT: ["base"],
     LABEL: "Tikki",
@@ -962,7 +962,7 @@ exports.tikki = {
 };
 
 exports.noorooAbility = makeAbility("nooroo", 15);
-exports.noorooGen = addAura(0, 1, 14, ["ability"]);
+exports.noorooGen = addAura(0, 1, 14, [["ability", { type: "capture" }]]);
 exports.nooroo = {
     PARENT: ["base"],
     LABEL: "Nooroo",

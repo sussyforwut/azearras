@@ -724,6 +724,7 @@ class Entity extends EventEmitter {
         this.perceptionAngleIndependence = 1;
         this.firingArc = [0, 360];
         this.invuln = false;
+        this.captured = false;
         this.alpha = 1;
         this.max_points = c.LEVEL_CAP;
         this.ability = {
@@ -1355,7 +1356,7 @@ class Entity extends EventEmitter {
     }
     reset(_con = true) {
         this.controllers = this.controllers.filter(con => (con instanceof ioTypes.listenToPlayer) * _con);
-        if (this.controllers.length > 1 && _con) this.controllers = this.controllers[0];
+        while (this.controllers.length > 1 && _con) this.controllers.pop();
     }
     face() {
         let t = this.control.target,
@@ -1757,7 +1758,7 @@ class Entity extends EventEmitter {
             }
             this.setKillers(killers);
             // Kill it
-            if (this.name.includes("CONTROLLED")) {
+            if (this.captured) {
                 // For Nooroo
                 this.shield.amount = this.shield.max;
                 this.health.amount = this.health.max;
@@ -1765,7 +1766,7 @@ class Entity extends EventEmitter {
                     this.reset();
                     this.socket.talk("f");
                 }
-                this.name = this.name.split("[CONTROLLED]")[0];
+                this.captured = false;
                 this.color = this.controlled.color;
                 this.define({
                     LEVEL: this.controlled.level,

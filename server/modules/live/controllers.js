@@ -704,17 +704,13 @@ class io_ability extends IO {
         super(body);
         this.master = this.body.master;
         this.ability = this.master.ability;
-        this.cap = false;
         this.active = false;
-        this.healing = false;
-        if (opts.heal != null) this.healing = opts.heal;
-        else this.cap = true;
         this.logged = [];
         this.ids = [];
         this.turrets = [];
         this.speed = 0;
-        this.check = 10;
-        this.master.on("dead", () => this.destroyTurrets());
+        this.check = 0;
+        this.mode = opts.type;
     }
     log() {
         this.logged = [];
@@ -738,7 +734,7 @@ class io_ability extends IO {
         // For attack
         if (!this.logged.length) return;
         let log = this.logged;
-        let _cap = this.cap ? 1 : 8;
+        let _cap = this.mode == "capture" ? 1 : 8;
         this.logged = [];
         for (let i = 0; i < _cap; i++) {
             let near = nearest(log, {
@@ -761,10 +757,18 @@ class io_ability extends IO {
         if (this.checkSave()) {
             this.destroyTurrets();
             this.logged.forEach(log => {
-                let o = new Entity(log, log);
-                o.define(this.cap ? Class.noorooAbility : this.healing ? Class.tikkiAbility : Class.plaggAbility);
-                // o.team = this.master.team;
-                // o.team = log.team;
+                let o = new Entity(log, this.master);
+                switch (this.mode) {
+                    case "capture":
+                        o.define(Class.noorooAbility);
+                        break;
+                    case "heal":
+                        o.define(Class.tikkiAbility);
+                        break;
+                    case "damage":
+                        o.define(Class.plaggAbility);
+                        break;
+                }
                 o.SIZE = log.SIZE * 1.2;
                 this.turrets.push(o);
             });
@@ -793,35 +797,39 @@ class io_ability extends IO {
     do() {
         for (let i = 0; i < this.logged.length; i++) {
             let e = this.logged[i];
-            if (this.healing) {
-                e.shield.amount = e.shield.max;
-                e.health.amount = e.health.max;
-            }
-            else if (this.cap) {
-                if (!e.isBot) {
-                    e.controllers = [
-                        new ioTypes.nearestDifferentMaster(e),
-                        new ioTypes.wanderAroundMap(e, { immitatePlayerMovement: true, lookAtGoal: true }),
-                        new ioTypes.mapTargetToGoal(e),
-                    ];
-                    e.socket.talk("f");
-                }
-                this.setControl(e);
-                e.define({
-                    LEVEL: (e.skill.maxSkillPoints - 45) * 3 + 45,
-                    TEAM: this.master.team
-                });
-                e.skill.set(e.skill.caps);
-                e.color = this.master.color;
-                e.name += "[CONTROLLED]";
-            }
-            else {
-                e.shield.amount *= 0.1;
-                if (e.health.amount < e.health.max * 0.2) {
-                    e._killers.push(this.master);
-                    e.kill();
-                }
-                else e.health.amount *= 0.1;
+            switch (this.mode) {
+                case "heal":
+                    e.shield.amount = e.shield.max;
+                    e.health.amount = e.health.max;
+                    break;
+                case "damage":
+                    if (e.health.amount < e.health.max * 0.2) {
+                        e._killers.push(this.master);
+                        e.kill();
+                    }
+                    else {
+                        e.health.amount *= 0.1;
+                        e.shield.amount *= 0.1;
+                    }
+                    break;
+                case "capture":
+                    if (!e.isBot) {
+                        e.controllers = [
+                            new ioTypes.nearestDifferentMaster(e),
+                            new ioTypes.wanderAroundMap(e, { immitatePlayerMovement: true, lookAtGoal: true }),
+                            new ioTypes.mapTargetToGoal(e),
+                        ];
+                        e.socket.talk("f");
+                    }
+                    e.define({
+                        LEVEL: (e.skill.maxSkillPoints - 45) * 3 + 45,
+                        TEAM: this.master.team
+                    });
+                    this.setControl(e);
+                    e.skill.set(e.skill.caps);
+                    e.color = this.master.color;
+                    e.captured = true;
+                    break;
             }
         }
     }
@@ -836,7 +844,7 @@ class io_ability extends IO {
                 case 3:
                     this.ability.used = 0;
                     this.active = false;
-                    this.ability.timer = 0.1 * 60000 / room.cycleSpeed;
+                    this.ability.timer = 1 * 60000 / room.cycleSpeed;
                     this.do();
                     this.destroyTurrets();
                     break;
