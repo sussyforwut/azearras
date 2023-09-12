@@ -138,7 +138,7 @@ class Gun {
         if (this.canShoot && !this.body.settings.hasNoRecoil) {
             // Apply recoil to motion
             if (this.motion > 0) {
-                let recoilForce = (-this.position * this.trueRecoil * 1.08 / this.body.size) / roomSpeed;
+                let recoilForce = (-this.position * this.trueRecoil * this.body.recoilMultiplier * 1.08 / this.body.size) / roomSpeed;
                 this.body.accel.x += recoilForce * Math.cos(this.recoilDir);
                 this.body.accel.y += recoilForce * Math.sin(this.recoilDir);
             }
@@ -711,6 +711,7 @@ class Entity extends EventEmitter {
         this.vfacing = 0;
         this.range = 0;
         this.damageRecieved = 0;
+        this.recoilMultiplier = 1;
         this.stepRemaining = 1;
         this.x = position.x;
         this.y = position.y;
@@ -1039,14 +1040,14 @@ class Entity extends EventEmitter {
         if ("function" === typeof set.LEVEL_SKILL_POINT_FUNCTION) {
             this.skill.LSPF = set.LEVEL_SKILL_POINT_FUNCTION;
         }
-        if (set.RECALC_SKILL) {
+        if (set.RECALC_SKILL != null) {
             let score = this.skill.score;
             this.skill.reset();
             this.skill.score = score;
             while (this.skill.maintain()) {}
         }
-        if (set.MAX_SKILL) this.max_points = set.MAX_SKILL;
-        if (set.EXTRA_SKILL) this.skill.points += set.EXTRA_SKILL;
+        if (set.MAX_SKILL != null) this.max_points = set.MAX_SKILL;
+        if (set.EXTRA_SKILL != null) this.skill.points += set.EXTRA_SKILL;
         if (set.BODY != null) {
             if (set.BODY.ACCELERATION != null) this.ACCELERATION = set.BODY.ACCELERATION;
             if (set.BODY.SPEED != null) this.SPEED = set.BODY.SPEED;
@@ -1059,6 +1060,7 @@ class Entity extends EventEmitter {
             if (set.BODY.FOV != null) this.FOV = set.BODY.FOV;
             if (set.BODY.RANGE != null) this.RANGE = set.BODY.RANGE;
             if (set.BODY.SHOCK_ABSORB != null) this.SHOCK_ABSORB = set.BODY.SHOCK_ABSORB;
+            if (set.BODY.RECOIL_MULTIPLIER != null) this.recoilMultiplier = set.BODY.RECOIL_MULTIPLIER;
             if (set.BODY.DENSITY != null) this.DENSITY = set.BODY.DENSITY;
             if (set.BODY.STEALTH != null) this.STEALTH = set.BODY.STEALTH;
             if (set.BODY.PUSHABILITY != null) this.PUSHABILITY = set.BODY.PUSHABILITY;
@@ -1181,7 +1183,7 @@ class Entity extends EventEmitter {
     syncTurrets() {
         for (let i = 0; i < this.turrets.length; i++) {
             this.turrets[i].skill = this.skill;
-            this.turrets[i].refreshBodyAttributes;
+            this.turrets[i].refreshBodyAttributes();
             this.turrets[i].syncTurrets();
         }
     }
@@ -1190,9 +1192,7 @@ class Entity extends EventEmitter {
         if (suc) {
             this.refreshBodyAttributes();
             for (let i = 0; i < this.guns.length; i++) this.guns[i].syncChildren();
-            for (let i = 0; i < this.turrets.length; i++) {
-                this.turrets[i].skillUp(stat);
-            }
+            for (let i = 0; i < this.turrets.length; i++) this.turrets[i].syncTurrets();
         }
         return suc;
     }
@@ -1337,8 +1337,8 @@ class Entity extends EventEmitter {
                     ref = this.bond;
                 this.x = ref.x + ref.size * bound.offset * Math.cos(bound.direction + bound.angle + ref.facing);
                 this.y = ref.y + ref.size * bound.offset * Math.sin(bound.direction + bound.angle + ref.facing);
-                ref.velocity.x += bound.size * this.accel.x;
-                ref.velocity.y += bound.size * this.accel.y;
+                ref.velocity.x += bound.size * this.accel.x * ref.recoilMultiplier;
+                ref.velocity.y += bound.size * this.accel.y * ref.recoilMultiplier;
                 this.firingArc = [ref.facing + bound.angle, bound.arc / 2];
                 this.accel.null();
                 this.blend = ref.blend;

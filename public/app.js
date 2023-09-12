@@ -1024,7 +1024,7 @@ const drawEntity = (drawingEntities, baseColor, x, y, instance, ratio, alpha = 1
                 len = t.offset * drawSize,
                 facing = 0
             if (turretFacesClient && drawingEntities) {
-                facing = instance.render.f + turretsObeyRot * rot + t.angle
+                facing = render.f + turretsObeyRot * rot + t.angle
             } else {
                 facing = source.turrets[i].lerpedFacing + turretsObeyRot * rot;
             }
@@ -1517,6 +1517,7 @@ function drawSkillBars(spacing, alcoveSize) {
     let y = global.screenHeight - spacing - height;
     let ticker = 11;
     let namedata = gui.getStatNames(global.mockups[gui.type].statnames || -1);
+    let clickableRatio = canvas.height / global.screenHeight;
     for (let i = 0; i < gui.skills.length; i++) {
         ticker--;
         //information about the bar
@@ -1565,7 +1566,7 @@ function drawSkillBars(spacing, alcoveSize) {
         drawText("[" + (ticker % 10) + "]", Math.round(x + len - height * 0.25) - 1.5, y + height / 2, height - 5, textcolor, "right", true);
         if (textcolor === color.guiwhite) {
             // If it's active
-            global.clickables.stat.place(ticker - 1, x, y, len, height);
+            global.clickables.stat.place(ticker - 1, x * clickableRatio, y * clickableRatio, len * clickableRatio, height * clickableRatio);
         }
 
         // Skill value
@@ -1576,7 +1577,7 @@ function drawSkillBars(spacing, alcoveSize) {
         // Move on
         y -= height + vspacing;
     }
-    global.clickables.hover.place(0, 0, y, 0.8 * len, 0.8 * (global.screenHeight - y));
+    global.clickables.hover.place(0, 0, y * clickableRatio, 0.8 * len * clickableRatio, (global.screenHeight - y) * clickableRatio);
     if (gui.points !== 0) {
         // Draw skillpoints to spend
         drawText("x" + gui.points, Math.round(x + len - 2) + 0.5, Math.round(y + height - 4) + 0.5, 20, color.guiwhite, "right");
@@ -1753,12 +1754,13 @@ function drawAvailableUpgrades(spacing, alcoveSize) {
         let ticker = 0;
         let colorIndex = 10;
         let columnCount = Math.max(3, Math.ceil(gui.upgrades.length / 4));
+        let clickableRatio = global.canvas.height / global.screenHeight;
         upgradeSpin += 0.01;
         for (let i = 0; i < gui.upgrades.length; i++) {
             let model = gui.upgrades[i];
             if (y > yo) yo = y;
             xxx = x;
-            global.clickables.upgrade.place(i, x, y, len, height);
+            global.clickables.upgrade.place(i, x * clickableRatio, y * clickableRatio, len * clickableRatio, height * clickableRatio);
 
             // Draw box
             ctx.globalAlpha = 0.5;
@@ -1811,7 +1813,7 @@ function drawAvailableUpgrades(spacing, alcoveSize) {
         drawBar(xx - m / 2, xx + m / 2, yy + h / 2, h + config.graphical.barChunk, color.black);
         drawBar(xx - m / 2, xx + m / 2, yy + h / 2, h, color.white);
         drawText(msg, xx, yy + h / 2, h - 2, color.guiwhite, "center", true);
-        global.clickables.skipUpgrades.place(0, xx - m / 2, yy, m, h);
+        global.clickables.skipUpgrades.place(0, (xx - m / 2) * clickableRatio, yy * clickableRatio, m * clickableRatio, h * clickableRatio);
     } else {
         global.canUpgrade = false;
         global.clickables.upgrade.hide();

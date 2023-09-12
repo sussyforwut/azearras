@@ -613,13 +613,13 @@ exports.trplnrsTestTank = {
     {
         POSITION: [10, 6, 1, 0, 14, 0, 0],
         PROPERTIES: {
-            SHOOT_SETTINGS: combineStats([g.basic, {size: 0.8, reload: 10}]),
+            SHOOT_SETTINGS: combineStats([g.basic, {size: 0.8, reload: 5}]),
             TYPE: 'swarm'
         }
     }, {
         POSITION: [10, 6, 1, 0, -14, 0, 0],
         PROPERTIES: {
-            SHOOT_SETTINGS: combineStats([g.basic, {size: 0.8, reload: 10}]),
+            SHOOT_SETTINGS: combineStats([g.basic, {size: 0.8, reload: 5}]),
             TYPE: 'swarm'
         }
     }, {
@@ -847,13 +847,13 @@ exports.Team101 = {
     PARENT: ["teams"],
     TEAM: TEAM_ROOM,
     COLOR: 3,
-    LABEL: "Arena Closer Team"
+    LABEL: "Room Team"
 };
 exports.Team101 = {
     PARENT: ["teams"],
     TEAM: TEAM_ENEMIES,
     COLOR: 3,
-    LABEL: "Boss Team"
+    LABEL: "Enemies Team"
 };
 exports.teams.UPGRADES_TIER_0.push("Team101");
 
