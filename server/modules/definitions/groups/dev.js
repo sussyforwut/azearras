@@ -743,26 +743,10 @@ exports.Team101 = {
 exports.teams.UPGRADES_TIER_0.push("Team101");
 
 // SPECIAL
-exports.base = {
-    PARENT: ["genericTank"],
-    SKILL_CAP: [14, 14, 14, 14, 14, 14, 14, 14, 14, 14],
-    MAX_SKILL: 140,
-    LEVEL: 45 + (140 - 45) * 3,
-    SHAPE: 0,
-    BODY: {
-        ACCEL: 0.2,
-        SPEED: base.SPEED * 0.7,
-        HEALTH: base.HEALTH * 2.8,
-        DAMAGE: base.DAMAGE * 1.4,
-        SHIELD: base.SHIELD * 1.4,
-        REGEN: base.REGEN * 1.4,
-    },
-};
-
 exports.plaggAbility = makeAbility("plagg", 9);
 exports.plaggGen = addAura(0, 1, 11, [["ability", { type: "damage" }]]);
 exports.plagg = {
-    PARENT: ["base"],
+    PARENT: ["genericTestBase"],
     LABEL: "Plagg",
     COLOR: 11,
     TURRETS: [
@@ -797,7 +781,7 @@ exports.plagg = {
 exports.tikkiAbility = makeAbility("tikki", 42);
 exports.tikkiGen = addAura(0, 1, 12, [["ability", { type: "heal" }]]);
 exports.tikki = {
-    PARENT: ["base"],
+    PARENT: ["genericTestBase"],
     LABEL: "Tikki",
     COLOR: 12,
     TURRETS: [
@@ -849,7 +833,7 @@ exports.tikki = {
 exports.noorooAbility = makeAbility("nooroo", 15);
 exports.noorooGen = addAura(0, 1, 14, [["ability", { type: "capture" }]]);
 exports.nooroo = {
-    PARENT: ["base"],
+    PARENT: ["genericTestBase"],
     LABEL: "Nooroo",
     COLOR: 43,
     TURRETS: [
@@ -881,13 +865,8 @@ exports.nooroo = {
     })(),
 };
 
-exports.plagg = addLSPF(exports.plagg, 140);
-exports.tikki = addLSPF(exports.tikki, 140);
-exports.nooroo = addLSPF(exports.nooroo, 140);
-
 // DEV "UPGRADE PATHS"
-exports.developer.UPGRADES_TIER_0 = ["basic", "healer", "spectator", "miscEntities", "eggGenerator", "bosses", "fun", "special", "levels", "teams", "dreadv1"];
-    exports.special.UPGRADES_TIER_0 = ["plagg", "tikki", "nooroo"];
+exports.developer.UPGRADES_TIER_0 = ["basic", "healer", "spectator", "miscEntities", "eggGenerator", "bosses", "fun", "levels", "teams", "dreadv1", "plagg", "tikki", "nooroo"];
     exports.miscEntities.UPGRADES_TIER_0 = ["baseProtector", "dominators", "mothership", "arenaCloser"];
         exports.dominators.UPGRADES_TIER_0 = ["dominator", "destroyerDominator", "gunnerDominator", "trapperDominator"];
     exports.bosses.UPGRADES_TIER_0 = ["sentries", "elites", "mysticals", "nesters", "rogues", "terrestrials", "celestials", "eternals"];

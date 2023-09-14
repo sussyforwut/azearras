@@ -300,3 +300,12 @@ exports.genericDreadnought1 = {
     EXTRA_SKILL: 48,
     SKILL_CAP: [smshskl, smshskl, smshskl, smshskl, smshskl, smshskl, smshskl, smshskl, smshskl, smshskl],
 }
+exports.genericTestBase = {
+    PARENT: ["genericTank"],
+    BODY: dreadnought1,
+    SHAPE: 0,
+    SIZE: 50,
+    LEVEL: 330,
+    EXTRA_SKILL: 98,
+    SKILL_CAP: [14, 14, 14, 14, 14, 14, 14, 14, 14, 14],
+}
