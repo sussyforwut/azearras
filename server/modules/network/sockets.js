@@ -509,6 +509,7 @@ function incoming(message, socket) {
             break;
 
         case "M":
+            if (player.body == null) return 1;
             let abort, message = m[0];
 
             if ("string" !==  typeof message) {
@@ -891,7 +892,6 @@ const spawn = (socket, name) => {
                 body.color = ran.choose([ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 ]);
             } else {
                 body.color = '12 0 1 0 false';
-                body.colorTeam[body.team] = '10 0 1 0 false';
             }
         }
     }
